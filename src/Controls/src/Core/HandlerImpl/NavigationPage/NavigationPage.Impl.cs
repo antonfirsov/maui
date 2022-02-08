@@ -44,16 +44,6 @@ namespace Microsoft.Maui.Controls
 
 		}
 
-		protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
-		{
-			return base.MeasureOverride(widthConstraint, heightConstraint);
-		}
-
-		protected override Size ArrangeOverride(Rectangle bounds)
-		{
-			return base.ArrangeOverride(bounds);
-		}
-
 		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
 		{
 			if (Content is IView view)

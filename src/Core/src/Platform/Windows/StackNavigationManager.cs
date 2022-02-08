@@ -171,18 +171,19 @@ namespace Microsoft.Maui.Platform
 				throw;
 			}
 
-			if (fe.IsLoaded)
+			fe.OnLoaded(() =>
 			{
-				NavigationView?.NavigationFinished(NavigationStack);
-				return;
-			}
+				FireNavigationFinished();
+				if (NavigationView is IView view)
+				{
+					view.Arrange(fe);
+				}
+			});
+		}
 
-			fe.Loaded += OnLoaded;
-			void OnLoaded(object sender, RoutedEventArgs e)
-			{
-				fe.Loaded -= OnLoaded;
-				NavigationView?.NavigationFinished(NavigationStack);
-			}
+		void FireNavigationFinished()
+		{
+			NavigationView?.NavigationFinished(NavigationStack);
 		}
 	}
 }

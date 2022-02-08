@@ -48,13 +48,7 @@ namespace Microsoft.Maui.Handlers
 
 		void OnLayoutChanged(object? sender, View.LayoutChangeEventArgs e)
 		{
-			var deviceIndependentLeft = Context.FromPixels(e.Left);
-			var deviceIndependentTop = Context.FromPixels(e.Top);
-			var deviceIndependentRight = Context.FromPixels(e.Right);
-			var deviceIndependentBottom = Context.FromPixels(e.Bottom);
-			var destination = Rectangle.FromLTRB(0, 0,
-				deviceIndependentRight - deviceIndependentLeft, deviceIndependentBottom - deviceIndependentTop);
-			//VirtualView.Arrange(destination);
+			VirtualView.Arrange(e);
 		}
 
 		private protected override void OnDisconnectHandler(View nativeView)
