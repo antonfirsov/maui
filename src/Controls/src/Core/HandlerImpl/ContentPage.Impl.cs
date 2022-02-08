@@ -10,12 +10,6 @@ namespace Microsoft.Maui.Controls
 		object IContentView.Content => Content;
 		IView IContentView.PresentedContent => Content;
 
-		public override Rectangle Frame
-		{
-			get => base.Frame;
-			set => base.Frame = value;
-		}
-
 		protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
 		{
 			DesiredSize = this.ComputeDesiredSize(widthConstraint, heightConstraint);
@@ -51,7 +45,7 @@ namespace Microsoft.Maui.Controls
 			}
 		}
 
-#region HotReload
+		#region HotReload
 
 		IView IReplaceableView.ReplacedView => HotReload.MauiHotReloadHelper.GetReplacedView(this) ?? this;
 
@@ -75,6 +69,6 @@ namespace Microsoft.Maui.Controls
 				//TODO: if reload handler is null, Do a manual reload?
 			});
 		}
-#endregion
+		#endregion
 	}
 }
