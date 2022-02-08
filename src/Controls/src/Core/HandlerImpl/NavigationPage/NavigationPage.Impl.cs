@@ -33,40 +33,11 @@ namespace Microsoft.Maui.Controls
 
 		Thickness IView.Margin => Thickness.Zero;
 
-		public override Rectangle Frame 
-		{ 
-			get => base.Frame; 
-			set => base.Frame = value; 
-		}
-
 		protected override void LayoutChildren(double x, double y, double width, double height)
 		{
-
+			// We don't want forcelayout to call the legacy
+			// Page.LayoutChildren code
 		}
-
-		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
-		{
-			if (Content is IView view)
-			{
-				_ = view.Measure(
-					ContainerArea.IsEmpty ? widthConstraint : ContainerArea.Width,
-					ContainerArea.IsEmpty ? heightConstraint : ContainerArea.Height);
-			}
-
-			return new Size(widthConstraint, heightConstraint);
-		}
-
-		protected override Size ArrangeOverride(Rectangle bounds)
-		{
-			Frame = this.ComputeFrame(bounds);
-
-			if (Content is IView view)
-			{
-				_ = view.Arrange(ContainerArea.IsEmpty ? bounds : ContainerArea);
-			}
-
-			return Frame.Size;
-		}*/
 
 		void INavigationView.RequestNavigation(NavigationRequest eventArgs)
 		{
