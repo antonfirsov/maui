@@ -33,10 +33,25 @@ namespace Microsoft.Maui.Controls
 
 		Thickness IView.Margin => Thickness.Zero;
 
+		public override Rectangle Frame 
+		{ 
+			get => base.Frame; 
+			set => base.Frame = value; 
+		}
 
 		protected override void LayoutChildren(double x, double y, double width, double height)
 		{
 
+		}
+
+		protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
+		{
+			return base.MeasureOverride(widthConstraint, heightConstraint);
+		}
+
+		protected override Size ArrangeOverride(Rectangle bounds)
+		{
+			return base.ArrangeOverride(bounds);
 		}
 
 		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
