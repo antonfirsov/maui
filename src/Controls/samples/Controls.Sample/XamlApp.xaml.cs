@@ -46,10 +46,7 @@ namespace Maui.Controls.Sample
 		// Must not use MainPage for multi-window
 		protected override Window CreateWindow(IActivationState activationState)
 		{
-			var window = new Window(new NavigationPage(Services.GetRequiredService<Page>())
-			{
-				Background = SolidColorBrush.Green
-			});
+			var window = new Window(Services.GetRequiredService<Page>());
 
 			window.Title = ".NET MAUI Samples Gallery";
 			return window;
