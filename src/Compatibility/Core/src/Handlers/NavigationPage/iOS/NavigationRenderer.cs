@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
-using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
@@ -14,6 +13,8 @@ using ObjCRuntime;
 using UIKit;
 using static Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.NavigationPage;
 using static Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page;
+using static Microsoft.Maui.Controls.Compatibility.Platform.iOS.AccessibilityExtensions;
+using static Microsoft.Maui.Controls.Compatibility.Platform.iOS.ToolbarItemExtensions;
 using PageUIStatusBarAnimation = Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.UIStatusBarAnimation;
 using PointF = CoreGraphics.CGPoint;
 using RectangleF = CoreGraphics.CGRect;
@@ -159,9 +160,9 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			PageController.SendDisappearing();
 		}
 
-		public override void ViewDidLayoutSubviews()
+		public override void ViewWillLayoutSubviews()
 		{
-			base.ViewDidLayoutSubviews();
+			base.ViewWillLayoutSubviews();
 			if (Current == null)
 				return;
 			UpdateToolBarVisible();
@@ -177,25 +178,46 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			var toolbarY = NavigationBarHidden || NavigationBar.Translucent || !_hasNavigationBar ? 0 : navBarFrameBottom;
 			toolbar.Frame = new RectangleF(0, toolbarY, View.Frame.Width, toolbar.Frame.Height);
 
-			double trueBottom = toolbar.Hidden ? toolbarY : toolbar.Frame.Bottom;
-			var modelSize = _queuedSize.IsZero ? Element.Bounds.Size : _queuedSize;
-			PageController.ContainerArea =
-				new Rectangle(0, toolbar.Hidden ? 0 : toolbar.Frame.Height, modelSize.Width, modelSize.Height - trueBottom);
+			//double trueBottom = toolbar.Hidden ? toolbarY : toolbar.Frame.Bottom;
+			//
+			//Element.Frame = new Rectangle(0, 0, View.Frame.Width, View.Frame.Height);
 
-			if (!_queuedSize.IsZero)
-			{
-				Element.Layout(new Rectangle(Element.X, Element.Y, _queuedSize.Width, _queuedSize.Height));
-				_queuedSize = Size.Zero;
-			}
+			//var modelSize = Element.Bounds.Size;
+			//PageController.ContainerArea =
+			//	new Rectangle(0, toolbar.Hidden ? 0 : toolbar.Frame.Height, View.Bounds.Width, View.Bounds.Height - trueBottom);
+
+			//Element.Frame = new Rectangle(0, 0, View.Frame.Width, View.Frame.Height);
+			//(Element as IView).Measure(View.Bounds.Width, View.Bounds.Height);
+
+			// This will set the Frame on the xplat view
+			(Element as IView).Arrange(View.Bounds.ToRectangle());
+
+			//(Element as IView)
+			//	.Arrange(new Rectangle(Element.X, Element.Y, modelSize.Width, modelSize.Height - trueBottom));
 
 			_loaded = true;
 
-			foreach (var view in View.Subviews)
+			/*foreach (var view in View.Subviews)
 			{
 				if (view == NavigationBar || view == _secondaryToolbar)
 					continue;
-				view.Frame = View.Bounds;
-			}
+
+				//view.Bounds = View.Bounds;
+				view.Frame = new RectangleF(0, 0, View.Bounds.Width, View.Bounds.Height - 86);
+			}*/
+
+			/*foreach (var view in View.Subviews)
+			{
+				if (view == NavigationBar || view == _secondaryToolbar)
+					continue;
+
+			view.Frame = new Rectangle(0, 0, modelSize.Width, modelSize.Height - trueBottom);
+			}*/
+		}
+
+		public override void ViewDidLayoutSubviews()
+		{
+			base.ViewDidLayoutSubviews();
 		}
 
 		public override void ViewDidLoad()
@@ -1052,13 +1074,16 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 				NavigationRenderer n;
 				if (_navigation.TryGetTarget(out n))
 					n.ValidateInsets();
+
+				base.ViewDidLayoutSubviews();
 			}
 
 			public override void ViewDidLayoutSubviews()
 			{
-				UIView nativeView;
+				/*UIView nativeView;
 				if ((nativeView = Child.ToPlatform()) != null)
-					nativeView.Frame = Child.Bounds.ToCGRect();
+					Child.Frame = nativeView.Frame.ToRectangle();*/
+				//nativeView.Frame = Child.Bounds.ToCGRect();
 
 				base.ViewDidLayoutSubviews();
 			}

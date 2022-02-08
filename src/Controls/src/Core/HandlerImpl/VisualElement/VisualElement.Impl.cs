@@ -12,7 +12,7 @@ namespace Microsoft.Maui.Controls
 		Semantics _semantics;
 
 		/// <include file="../../../../docs/Microsoft.Maui.Controls/VisualElement.xml" path="//Member[@MemberName='Frame']/Docs" />
-		public Rectangle Frame
+		public virtual Rectangle Frame
 		{
 			get => Bounds;
 			set

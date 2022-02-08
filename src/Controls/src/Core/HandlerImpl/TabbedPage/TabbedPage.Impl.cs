@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Layouts;
 
 namespace Microsoft.Maui.Controls
 {
@@ -10,6 +11,88 @@ namespace Microsoft.Maui.Controls
 		{
 			base.OnHandlerChangedCore();
 		}
+
+		protected override void LayoutChildren(double x, double y, double width, double height)
+		{
+
+		}
+
+		public override Rectangle Frame
+		{
+			get => base.Frame;
+			set => base.Frame = value;
+		}
+
+
+		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
+		{
+			var size =  base.MeasureOverride(widthConstraint, heightConstraint);
+			var childWidth = widthConstraint;
+			var childHeight = heightConstraint;
+
+			if (!ContainerArea.IsEmpty)
+			{
+				childWidth = ContainerArea.Width;
+				childHeight = ContainerArea.Height;
+			}
+
+			foreach (var child in Children)
+			{
+				if (child is IView view)
+				{
+					_ = child.Measure(childWidth, childHeight);
+				}
+			}
+
+			return size;
+		}
+
+		protected override Size ArrangeOverride(Rectangle bounds)
+		{
+			var arrangeSize = base.ArrangeOverride(bounds);
+			var childWidth = Frame.Width;
+			var childHeight = Frame.Height;
+
+			if (!ContainerArea.IsEmpty)
+			{
+				childWidth = ContainerArea.Width;
+				childHeight = ContainerArea.Height;
+			}
+
+			var childBounds = new Rectangle(0, 0, childWidth, childHeight);
+
+			foreach (var child in Children)
+			{
+				if (child is IView view)
+				{
+					_ = view.Arrange(childBounds);
+				}
+			}
+
+			return arrangeSize;
+		}*/
+
+		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
+		{
+			if (Content is IView view)
+			{
+				_ = view.Measure(widthConstraint, heightConstraint);
+			}
+
+			return new Size(widthConstraint, heightConstraint);
+		}
+
+		protected override Size ArrangeOverride(Rectangle bounds)
+		{
+			Frame = this.ComputeFrame(bounds);
+
+			if (Content is IView view)
+			{
+				_ = view.Arrange(Frame);
+			}
+
+			return Frame.Size;
+		}*/
 
 		private protected override void OnHandlerChangingCore(HandlerChangingEventArgs args)
 		{

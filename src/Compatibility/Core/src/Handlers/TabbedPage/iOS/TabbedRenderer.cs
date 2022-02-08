@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Graphics;
-using ObjCRuntime;
 using UIKit;
 using static Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page;
 using PageUIStatusBarAnimation = Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.UIStatusBarAnimation;
@@ -24,8 +23,7 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		UIColor _defaultBarColor;
 		bool _defaultBarColorSet;
 		bool? _defaultBarTranslucent;
-		bool _loaded;
-		Size _queuedSize;
+		//bool _loaded;
 		IMauiContext _mauiContext;
 		IMauiContext MauiContext => _mauiContext;
 		public static IPropertyMapper<TabbedPage, TabbedRenderer> Mapper = new PropertyMapper<TabbedPage, TabbedRenderer>(ViewHandler.ViewMapper);
@@ -86,14 +84,6 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			UpdateBarTranslucent();
 		}
 
-		public void SetElementSize(Size size)
-		{
-			if (_loaded)
-				Element.Layout(new Rectangle(Element.X, Element.Y, size.Width, size.Height));
-			else
-				_queuedSize = size;
-		}
-
 		public UIViewController ViewController
 		{
 			get { return this; }
@@ -125,7 +115,7 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			if (Element == null)
 				return;
 
-			if (Element.Parent is BaseShellItem)
+			/*if (Element.Parent is BaseShellItem)
 				Element.Layout(View.Bounds.ToRectangle());
 
 			if (!Element.Bounds.IsEmpty)
@@ -136,15 +126,35 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			var frame = View.Frame;
 			var tabBarFrame = TabBar.Frame;
 			Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
+			Element.Layout(new Rectangle(Element.X, Element.Y, frame.Width, frame.Height));*/
 
-			if (!_queuedSize.IsZero)
-			{
-				Element.Layout(new Rectangle(Element.X, Element.Y, _queuedSize.Width, _queuedSize.Height));
-				_queuedSize = Size.Zero;
-			}
+			//var frame = View.Bounds;
+			//var tabBarFrame = TabBar.Frame;
+			//Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
+			//Element.Frame = frame.ToRectangle();
 
-			_loaded = true;
+			//(Element as IView).Measure(View.Bounds.Width, View.Bounds.Height);
+			(Element as IView).Arrange(View.Bounds.ToRectangle());
+
+
+			//var bar = TabBar;
+
+			//TabBar.UpdateBackground((Brush)SolidColorBrush.Purple);
+			//_loaded = true;
 		}
+
+		/*public override void ViewWillLayoutSubviews()
+		{
+			var frame = View.Frame;
+			var tabBarFrame = TabBar.Frame;
+			Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
+			//Element.Frame = new Rectangle(0, 0, frame.Width, frame.Height);
+
+			(Element as IView).Measure(View.Frame.Width, View.Frame.Height);
+			(Element as IView).Arrange(View.Frame.ToRectangle());
+
+			//base.ViewWillLayoutSubviews();
+		}*/
 
 		protected override void Dispose(bool disposing)
 		{

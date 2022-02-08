@@ -33,11 +33,19 @@ namespace Microsoft.Maui.Controls
 
 		Thickness IView.Margin => Thickness.Zero;
 
-		protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
+
+		protected override void LayoutChildren(double x, double y, double width, double height)
+		{
+
+		}
+
+		/*protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
 		{
 			if (Content is IView view)
 			{
-				_ = view.Measure(widthConstraint, heightConstraint);
+				_ = view.Measure(
+					ContainerArea.IsEmpty ? widthConstraint : ContainerArea.Width,
+					ContainerArea.IsEmpty ? heightConstraint : ContainerArea.Height);
 			}
 
 			return new Size(widthConstraint, heightConstraint);
@@ -49,11 +57,11 @@ namespace Microsoft.Maui.Controls
 
 			if (Content is IView view)
 			{
-				_ = view.Arrange(Frame);
+				_ = view.Arrange(ContainerArea.IsEmpty ? bounds : ContainerArea);
 			}
 
 			return Frame.Size;
-		}
+		}*/
 
 		void INavigationView.RequestNavigation(NavigationRequest eventArgs)
 		{
