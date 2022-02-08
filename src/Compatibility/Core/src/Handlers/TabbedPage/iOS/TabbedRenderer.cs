@@ -23,7 +23,6 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		UIColor _defaultBarColor;
 		bool _defaultBarColorSet;
 		bool? _defaultBarTranslucent;
-		//bool _loaded;
 		IMauiContext _mauiContext;
 		IMauiContext MauiContext => _mauiContext;
 		public static IPropertyMapper<TabbedPage, TabbedRenderer> Mapper = new PropertyMapper<TabbedPage, TabbedRenderer>(ViewHandler.ViewMapper);
@@ -114,47 +113,7 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 
 			if (Element == null)
 				return;
-
-			/*if (Element.Parent is BaseShellItem)
-				Element.Layout(View.Bounds.ToRectangle());
-
-			if (!Element.Bounds.IsEmpty)
-			{
-				View.Frame = new System.Drawing.RectangleF((float)Element.X, (float)Element.Y, (float)Element.Width, (float)Element.Height);
-			}
-
-			var frame = View.Frame;
-			var tabBarFrame = TabBar.Frame;
-			Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
-			Element.Layout(new Rectangle(Element.X, Element.Y, frame.Width, frame.Height));*/
-
-			//var frame = View.Bounds;
-			//var tabBarFrame = TabBar.Frame;
-			//Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
-			//Element.Frame = frame.ToRectangle();
-
-			//(Element as IView).Measure(View.Bounds.Width, View.Bounds.Height);
-			(Element as IView).Arrange(View.Bounds.ToRectangle());
-
-
-			//var bar = TabBar;
-
-			//TabBar.UpdateBackground((Brush)SolidColorBrush.Purple);
-			//_loaded = true;
 		}
-
-		/*public override void ViewWillLayoutSubviews()
-		{
-			var frame = View.Frame;
-			var tabBarFrame = TabBar.Frame;
-			Page.ContainerArea = new Rectangle(0, 0, frame.Width, frame.Height - tabBarFrame.Height);
-			//Element.Frame = new Rectangle(0, 0, frame.Width, frame.Height);
-
-			(Element as IView).Measure(View.Frame.Width, View.Frame.Height);
-			(Element as IView).Arrange(View.Frame.ToRectangle());
-
-			//base.ViewWillLayoutSubviews();
-		}*/
 
 		protected override void Dispose(bool disposing)
 		{
