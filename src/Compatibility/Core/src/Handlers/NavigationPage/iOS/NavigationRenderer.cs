@@ -27,7 +27,6 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		internal const string UpdateToolbarButtons = "Xamarin.UpdateToolbarButtons";
 		bool _appeared;
 		bool _ignorePopCall;
-		bool _loaded;
 		FlyoutPage _parentFlyoutPage;
 		Size _queuedSize;
 		UIViewController[] _removeControllers;
@@ -42,11 +41,14 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		public static IPropertyMapper<NavigationPage, NavigationRenderer> Mapper = new PropertyMapper<NavigationPage, NavigationRenderer>(ViewHandler.ViewMapper);
 		public static CommandMapper<NavigationPage, NavigationRenderer> CommandMapper = new CommandMapper<NavigationPage, NavigationRenderer>(ViewHandler.ViewCommandMapper);
 		ViewHandlerDelegator<NavigationPage> _viewHandlerWrapper;
+		bool _navigating = false;
 
 		[Preserve(Conditional = true)]
 		public NavigationRenderer() : base(typeof(MauiControlsNavigationBar), null)
 		{
 			_viewHandlerWrapper = new ViewHandlerDelegator<NavigationPage>(Mapper, CommandMapper, this);
+
+			Delegate = new MauiNavigationDelegate(this);
 		}
 
 		Page Current { get; set; }
@@ -177,42 +179,8 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			// Use 0 if the NavBar is hidden or will be hidden
 			var toolbarY = NavigationBarHidden || NavigationBar.Translucent || !_hasNavigationBar ? 0 : navBarFrameBottom;
 			toolbar.Frame = new RectangleF(0, toolbarY, View.Frame.Width, toolbar.Frame.Height);
-
-			//double trueBottom = toolbar.Hidden ? toolbarY : toolbar.Frame.Bottom;
-			//
-			//Element.Frame = new Rectangle(0, 0, View.Frame.Width, View.Frame.Height);
-
-			//var modelSize = Element.Bounds.Size;
-			//PageController.ContainerArea =
-			//	new Rectangle(0, toolbar.Hidden ? 0 : toolbar.Frame.Height, View.Bounds.Width, View.Bounds.Height - trueBottom);
-
-			//Element.Frame = new Rectangle(0, 0, View.Frame.Width, View.Frame.Height);
-			//(Element as IView).Measure(View.Bounds.Width, View.Bounds.Height);
-
-			// This will set the Frame on the xplat view
+			
 			(Element as IView).Arrange(View.Bounds.ToRectangle());
-
-			//(Element as IView)
-			//	.Arrange(new Rectangle(Element.X, Element.Y, modelSize.Width, modelSize.Height - trueBottom));
-
-			_loaded = true;
-
-			/*foreach (var view in View.Subviews)
-			{
-				if (view == NavigationBar || view == _secondaryToolbar)
-					continue;
-
-				//view.Bounds = View.Bounds;
-				view.Frame = new RectangleF(0, 0, View.Bounds.Width, View.Bounds.Height - 86);
-			}*/
-
-			/*foreach (var view in View.Subviews)
-			{
-				if (view == NavigationBar || view == _secondaryToolbar)
-					continue;
-
-			view.Frame = new Rectangle(0, 0, modelSize.Width, modelSize.Height - trueBottom);
-			}*/
 		}
 
 		public override void ViewDidLayoutSubviews()
@@ -502,7 +470,7 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			//if the last time we did ViewDidLayoutSubviews we had other value for _hasNavigationBar
 			//we will need to relayout. This is because Current is updated async of the layout happening
 			if (_hasNavigationBar != NavigationPage.GetHasNavigationBar(newCurrentPage))
-				ViewDidLayoutSubviews();
+				View.InvalidateMeasure(Element);
 		}
 
 		void UpdateHideNavigationBarSeparator()
@@ -794,6 +762,8 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		{
 			if (_secondaryToolbar == null)
 				return;
+
+			bool currentHidden = _secondaryToolbar.Hidden;
 			if (TopViewController != null && TopViewController.ToolbarItems != null && TopViewController.ToolbarItems.Any())
 			{
 				_secondaryToolbar.Hidden = false;
@@ -803,6 +773,12 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 			{
 				_secondaryToolbar.Hidden = true;
 				//secondaryToolbar.Items = null;
+			}
+
+			if (currentHidden != _secondaryToolbar.Hidden)
+			{
+				if(Current?.Handler != null)
+					Current.ToPlatform().InvalidateMeasure(Current);
 			}
 
 			TopViewController?.NavigationItem?.TitleView?.SizeToFit();
@@ -922,8 +898,8 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		{
 			nfloat navBottom = NavigationBar.Frame.Bottom;
 
-			if (_navigationBottom != navBottom && Current != null)
-				ViewDidLayoutSubviews();
+			/*if (_navigationBottom != navBottom && Current != null)
+				ViewDidLayoutSubviews();*/
 		}
 
 		class SecondaryToolbar : UIToolbar
@@ -989,6 +965,35 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 					var l = new UIView(new RectangleF(0, 0, 1, 24)) { BackgroundColor = new UIColor(0, 0, 0, 0.2f) };
 					AddSubview(l);
 					_lines.Add(l);
+				}
+			}
+		}
+
+		class MauiNavigationDelegate : UINavigationControllerDelegate
+		{
+			readonly WeakReference<NavigationRenderer> _navigation;
+			public MauiNavigationDelegate(NavigationRenderer navigationRenderer)
+			{
+				_navigation = new WeakReference<NavigationRenderer>(navigationRenderer);
+			}
+
+			public override void DidShowViewController(UINavigationController navigationController, [Transient] UIViewController viewController, bool animated)
+			{
+				if (_navigation.TryGetTarget(out NavigationRenderer r))
+				{
+					r._navigating = false;
+					if (r.ViewController is ParentingViewController pvc)
+					{
+						pvc.UpdateFrames();
+					}
+				}
+			}
+
+			public override void WillShowViewController(UINavigationController navigationController, [Transient] UIViewController viewController, bool animated)
+			{
+				if (_navigation.TryGetTarget(out NavigationRenderer r))
+				{
+					r._navigating = true;
 				}
 			}
 		}
@@ -1067,25 +1072,49 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 				Disappearing?.Invoke(this, EventArgs.Empty);
 			}
 
+			public void UpdateFrames()
+			{
+				NavigationRenderer n;
+				if (_navigation.TryGetTarget(out n) &&
+					ChildViewControllers.Length > 0 &&
+					!n._navigating)
+				{
+					nfloat offset = 0;
+
+					if (n._hasNavigationBar)
+						offset = n.NavigationBar.Frame.Bottom;
+
+					if (!n._secondaryToolbar.Hidden)
+					{
+						offset += n._secondaryToolbar.Bounds.Height;
+					}
+
+					if(View.Frame.Y != offset)
+					{
+						var newY = offset - View.Frame.Y;
+						var newHeight = View.Frame.Height - newY;
+
+						View.Frame =
+							new RectangleF(0, offset, View.Bounds.Width, newHeight);
+					}
+				}
+			}
+
 			public override void ViewWillLayoutSubviews()
 			{
 				base.ViewWillLayoutSubviews();
 
 				NavigationRenderer n;
 				if (_navigation.TryGetTarget(out n))
+				{
 					n.ValidateInsets();
-
-				base.ViewDidLayoutSubviews();
+				}
 			}
 
 			public override void ViewDidLayoutSubviews()
 			{
-				/*UIView nativeView;
-				if ((nativeView = Child.ToPlatform()) != null)
-					Child.Frame = nativeView.Frame.ToRectangle();*/
-				//nativeView.Frame = Child.Bounds.ToCGRect();
-
 				base.ViewDidLayoutSubviews();
+				UpdateFrames();
 			}
 
 			public override void ViewDidLoad()
@@ -1392,6 +1421,10 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 					return;
 
 				var hasNavBar = NavigationPage.GetHasNavigationBar(current);
+				if (!_navigation.TryGetTarget(out NavigationRenderer navigationRenderer))
+				{
+					navigationRenderer._hasNavigationBar = hasNavBar;
+				}
 
 				if (NavigationController.NavigationBarHidden == hasNavBar)
 				{
