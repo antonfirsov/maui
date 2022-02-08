@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="Maui.Controls.Sample.Pages.TabbedPageGallery"
     Title="Tabbed Page">
-    <ContentPage Title="Tab 1" Background="Pink">
+    <ContentPage Title="Tab 1">
         <VerticalStackLayout>
             <Button Text="Set Tabbed Page as Root" Clicked="OnTabbedPageAsRoot"></Button>
             <Button Text="Toggle Bottom Tabs (Android)" Clicked="OnSetToBottomTabs"></Button>

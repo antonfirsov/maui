@@ -111,8 +111,8 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		{
 			base.ViewDidLayoutSubviews();
 
-			if (Element == null)
-				return;
+			if (Element is IView view)
+				view.Arrange(View.Bounds.ToRectangle());
 		}
 
 		protected override void Dispose(bool disposing)
