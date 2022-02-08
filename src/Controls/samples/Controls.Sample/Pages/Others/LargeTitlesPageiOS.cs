@@ -11,7 +11,7 @@ namespace Maui.Controls.Sample.Pages
 {
 	public class LargeTitlesPageiOS : ContentPage
 	{
-		public LargeTitlesPageiOS(ICommand restore)
+		public LargeTitlesPageiOS()
 		{
 			Title = "Large Titles";
 
