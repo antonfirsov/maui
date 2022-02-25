@@ -55,7 +55,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isiOS11OrNewer.HasValue)
-					s_isiOS11OrNewer = OperatingSystem.IsIOSVersionAtLeast(11, 0);
+					s_isiOS11OrNewer = OperatingSystem.IsIOSVersionAtLeast(11, 0) || OperatingSystem.IsTvOSVersionAtLeast(11, 0);
 				return s_isiOS11OrNewer.Value;
 			}
 		}
@@ -65,7 +65,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isiOS12OrNewer.HasValue)
-					s_isiOS12OrNewer = OperatingSystem.IsIOSVersionAtLeast(12, 0);
+					s_isiOS12OrNewer = OperatingSystem.IsIOSVersionAtLeast(12, 0) || OperatingSystem.IsTvOSVersionAtLeast(12, 0);
 				return s_isiOS12OrNewer.Value;
 			}
 		}
@@ -75,7 +75,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isiOS13OrNewer.HasValue)
-					s_isiOS13OrNewer = OperatingSystem.IsIOSVersionAtLeast(13, 0);
+					s_isiOS13OrNewer = OperatingSystem.IsIOSVersionAtLeast(13, 0) || OperatingSystem.IsTvOSVersionAtLeast(13, 0);
 				return s_isiOS13OrNewer.Value;
 			}
 		}
@@ -85,7 +85,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isiOS14OrNewer.HasValue)
-					s_isiOS14OrNewer = OperatingSystem.IsIOSVersionAtLeast(14, 0);
+					s_isiOS14OrNewer = OperatingSystem.IsIOSVersionAtLeast(14, 0) || OperatingSystem.IsTvOSVersionAtLeast(14, 0);
 				return s_isiOS14OrNewer.Value;
 			}
 		}
@@ -95,7 +95,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isiOS15OrNewer.HasValue)
-					s_isiOS15OrNewer = OperatingSystem.IsIOSVersionAtLeast(15, 0);
+					s_isiOS15OrNewer = OperatingSystem.IsIOSVersionAtLeast(15, 0) || OperatingSystem.IsTvOSVersionAtLeast(15, 0);
 				return s_isiOS15OrNewer.Value;
 			}
 		}
@@ -117,29 +117,6 @@ namespace Microsoft.Maui.Controls.Compatibility
 			}
 		}
 #else
-		static bool? s_isSierraOrNewer;
-
-		internal static bool IsSierraOrNewer
-		{
-			get
-			{
-				if (!s_isSierraOrNewer.HasValue)
-					s_isSierraOrNewer = NSProcessInfo.ProcessInfo.IsOperatingSystemAtLeastVersion(new NSOperatingSystemVersion(10, 12, 0));
-				return s_isSierraOrNewer.Value;
-			}
-		}
-
-		static bool? s_isHighSierraOrNewer;
-
-		internal static bool IsHighSierraOrNewer
-		{
-			get
-			{
-				if (!s_isHighSierraOrNewer.HasValue)
-					s_isHighSierraOrNewer = NSProcessInfo.ProcessInfo.IsOperatingSystemAtLeastVersion(new NSOperatingSystemVersion(10, 13, 0));
-				return s_isHighSierraOrNewer.Value;
-			}
-		}
 
 		static bool? s_isMojaveOrNewer;
 
@@ -148,7 +125,7 @@ namespace Microsoft.Maui.Controls.Compatibility
 			get
 			{
 				if (!s_isMojaveOrNewer.HasValue)
-					s_isMojaveOrNewer = NSProcessInfo.ProcessInfo.IsOperatingSystemAtLeastVersion(new NSOperatingSystemVersion(10, 14, 0));
+					s_isMojaveOrNewer = OperatingSystem.IsMacOSVersionAtLeast (10, 14);
 				return s_isMojaveOrNewer.Value;
 			}
 		}
@@ -280,11 +257,6 @@ namespace Microsoft.Maui.Controls.Compatibility
 					handler.UseProxy = true;
 				}
 				return new HttpClient(handler);
-			}
-
-			public SizeRequest GetPlatformSize(VisualElement view, double widthConstraint, double heightConstraint)
-			{
-				return Platform.iOS.Platform.GetNativeSize(view, widthConstraint, heightConstraint);
 			}
 
 			public OSAppTheme RequestedTheme
