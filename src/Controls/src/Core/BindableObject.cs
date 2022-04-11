@@ -274,7 +274,7 @@ namespace Microsoft.Maui.Controls
 				SetInheritedBindingContext(titleView, BindingContext);
 		}
 
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null, bool updateHandler = true)
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null, bool requireHandlerUpdate = true)
 			=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		protected virtual void OnPropertyChanging([CallerMemberName] string propertyName = null)
